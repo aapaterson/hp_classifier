@@ -1,5 +1,5 @@
 {
-  description = "DevEnv for BMCP";
+  description = "DevEnv for HP_Classifier";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/";
