@@ -2,10 +2,10 @@
   description = "DevEnv for HP_Classifier";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/";
+    nixpkgs.url = "github:NixOS/nixpkgs/25.11";
+    flake-utils.url = "github:numtide/flake-utils";
     styler-formatter.url =
       "github:NixOS/nixpkgs/870493f9a8cb0b074ae5b411b2f232015db19a65";
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = { self, nixpkgs, ... }@inputs:
@@ -29,6 +29,8 @@
             python313Packages.numpy
             python313Packages.pandas
             python313Packages.matplotlib
+            python313Packages.transformers
+            python313Packages.torch
             taglib # binaries
             openssl
             git
