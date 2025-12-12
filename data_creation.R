@@ -71,7 +71,7 @@ training_data <- function(queries, dates, sample_size, n_intervals) {
         tibble::add_column(response = 0) %>%
         dplyr::distinct()
 
-    data() <- vroom::vroom(
+    data <- vroom::vroom(
         "../../hp-extractor/raw_data/hp_abstracts.tsv",
         delim = "\t"
     ) %>%
@@ -80,31 +80,60 @@ training_data <- function(queries, dates, sample_size, n_intervals) {
         dplyr::select(!pmid) %>%
         tibble::add_column(response = 1) %>%
         dplyr::bind_rows(psuedo_absence_data) %>%
-        dplyr::mutate(abs = corpus_creation(abs))
+        dplyr::mutate(abs = corpus_creation(abs)) %>%
+        dplyr::filter(abs != "na")
 
     readr::write_tsv(data, "abs_data.tsv")
 }
 
+generate_negative_queries <- function() {
+    Species <- genus_name <- sp_epithet <- NULL
+
+    virus_names <- vroom::vroom(
+        "~/Downloads/virus.csv",
+        delim = ","
+    ) %>%
+        dplyr::select(Species)
+
+    bacteria_names <- vroom::vroom(
+        "~/Downloads/lpsn_gss_2025-12-12.csv",
+        delim = ","
+    ) %>%
+        dplyr::mutate(bact = paste(genus_name, sp_epithet)) %>%
+        dplyr::filter(!grepl("NA", Species)) %>%
+        dplyr::select(Species) %>%
+        dplyr::distinct()
+
+    query <- "[Text Word]
+        AND 'infection'
+		OR [Text Word] 'disease'
+		OR [Text Word] 'human'
+		OR [Text Word] 'animal'
+		OR [Text Word] 'zoo'
+		OR [Text Word] 'vet'
+		OR [Text Word] 'epidemic'
+        OR 'epizootic' [Text Word]
+        AND 1960:2016[DP]"
+
+    queries_virus <- paste(virus_names$Species, query)
+    queries_bacteria <- paste(bacteria_names$bact, query)
+
+    queries <- c(queries_virus, queries_bacteria)
+    sample(queries, ceiling(length(queries) / 1000))
+}
+
 generate_training_data <- function() {
+    queries <- generate_negative_queries()
+
     training_data(
-        queries = c("ecology*[Title/Abstract]
-    NOT (infectious [Title/Abstract])
-    NOT (disease [Title/Abstract])
-    NOT (diseases [Title/Abstract])
-    NOT (virus [Title/Abstract])
-    NOT (host [Title/Abstract])
-    NOT (hosts [Title/Abstract])
-    NOT (pathogen [Title/Abstract])
-    NOT (parasite [Title/Abstract])
-    AND english[LA]
-    AND Journal Article[PT]"),
+        queries = queries,
         dates = c(1961, 2016),
-        sample_size = 35000,
+        sample_size = 210,
         n_intervals = 7
     )
 }
 
-generate_training_data() # missing 2 entries for some reason !!!!!
+# generate_training_data() # missing 2 entries for some reason !!!!!
 
 main <- function() {
     today <- format(Sys.Date(), "%Y/%m/%d")
