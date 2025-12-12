@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 df = pd.read_csv("abs_data.tsv", sep="\t").fillna(0)
+df = df.drop_duplicates(subset=["absID"])
 df_train, df_test_sup = sk.model_selection.train_test_split(
     df, test_size=0.3, stratify=df["response"], random_state=50
 )
