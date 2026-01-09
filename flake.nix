@@ -46,6 +46,7 @@
             rPackages.tm
             rPackages.bibliometrix
             rPackages.rsample
+            rPackages.renv
             inputs.styler-formatter.legacyPackages."${system}".rPackages.styler
           ];
           shellHook = ''
