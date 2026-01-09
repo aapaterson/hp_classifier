@@ -4,7 +4,7 @@ library(magrittr)
 # Create dataset with tidied corpus
 
 pubmedQuery <- function(query, n = 1000) {
-    AB <- PMID <- NULL
+    AB <- PMID <- API_KEY <- NULL
     tryCatch(
         {
             count <- pubmedR::pmQueryTotalCount(
@@ -99,7 +99,7 @@ training_data <- function(queries, dates, sample_size, n_intervals) {
         dplyr::filter(abs != "na")
 
     # data
-    readr::write_tsv(data, "abs_data_new.tsv")
+    readr::write_tsv(data, "abs_data.tsv")
 }
 
 generate_negative_queries <- function() {
