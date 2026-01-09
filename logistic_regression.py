@@ -3,8 +3,7 @@ import sklearn as sk
 import numpy as np
 import matplotlib.pyplot as plt
 
-df = pd.read_csv("abs_data.tsv", sep="\t").fillna(0)
-df = df.drop_duplicates(subset=["absID"])
+df = pd.read_csv("abs_data.tsv", sep="\t").drop_duplicates(subset=["absID"])
 df_train, df_test_sup = sk.model_selection.train_test_split(
     df, test_size=0.3, stratify=df["response"], random_state=50
 )
@@ -26,10 +25,13 @@ pipe = sk.pipeline.Pipeline(
         ("clf", sk.linear_model.LogisticRegression()),
     ]
 )
-pipe.set_params(dim_red__n_components=1000).fit(X_train, y_train)
+pipe.set_params(dim_red__n_components=1000, vectorizer__stop_words="english").fit(
+    X_train, y_train
+)
 
 pipe.score(X_val, y_val)
 sk.metrics.fbeta_score(pipe.predict(X_val), y_val, beta=10)
+sk.metrics.f1_score(pipe.predict(X_val), y_val)
 
 pca = pipe["dim_red"]
 PC_values = np.arange(pca.n_components_) + 1
