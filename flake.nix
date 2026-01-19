@@ -4,18 +4,23 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/25.11";
     flake-utils.url = "github:numtide/flake-utils";
-    styler-formatter.url =
-      "github:NixOS/nixpkgs/870493f9a8cb0b074ae5b411b2f232015db19a65";
+    styler-formatter.url = "github:NixOS/nixpkgs/870493f9a8cb0b074ae5b411b2f232015db19a65";
   };
 
-  outputs = { self, nixpkgs, ... }@inputs:
+  outputs =
+    { self, nixpkgs, ... }@inputs:
     let
-      supportedSystems =
-        [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ];
+      supportedSystems = [
+        "x86_64-linux"
+        "x86_64-darwin"
+        "aarch64-linux"
+        "aarch64-darwin"
+      ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
       pkgs = forAllSystems (system: nixpkgs.legacyPackages.${system});
 
-    in {
+    in
+    {
       devShells = forAllSystems (system: {
         default = pkgs.${system}.mkShell {
           venvDir = "./.venv";
@@ -31,6 +36,7 @@
             python313Packages.matplotlib
             python313Packages.transformers
             python313Packages.torch
+            python313Packages.wordcloud
             taglib # binaries
             openssl
             git
