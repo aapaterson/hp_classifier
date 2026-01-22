@@ -85,6 +85,7 @@ training_data <- function(queries, dates, sample_size, n_intervals) {
     data <- vroom::vroom(
         "../../hp-extractor/raw_data/hp_abstracts.tsv",
         delim = "\t",
+        escape_backslash = TRUE,
         show_col_types = FALSE
     ) %>%
         dplyr::inner_join(id_data) %>%
